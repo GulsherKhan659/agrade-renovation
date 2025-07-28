@@ -1150,18 +1150,18 @@
     <script src="assets/js/custom.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('contact-form-2');
+    const form = document.getElementById('contact-form-1');
+    const button = form.querySelector('button[type="submit"]');
+    const originalText = button.innerHTML;
 
     form.addEventListener('submit', function (e) {
-        e.preventDefault(); // Stop the form from submitting normally
+        e.preventDefault();
+
+        // Create loading spinner
+        button.disabled = true;
+        button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sending...`;
 
         const formData = new FormData(form);
-        const submitButton = form.querySelector('button[type="submit"]');
-        const originalButtonText = submitButton.innerHTML;
-
-        // Disable button and show loading text
-        submitButton.disabled = true;
-        submitButton.innerHTML = 'Please wait...';
 
         fetch(form.action, {
             method: 'POST',
@@ -1171,25 +1171,26 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }).then(response => {
             if (response.ok) {
-                form.reset(); // Clear the form
-                showSuccessMessage("Thank you for your response! We will contact you later.");
+                form.reset();
+                showSuccessMessage("✅ Thank you! We'll contact you shortly.");
             } else {
                 return response.json().then(data => {
                     throw new Error(data.message || "Something went wrong.");
                 });
             }
         }).catch(error => {
-            alert("Submission failed: " + error.message);
+            alert("❌ Submission failed: " + error.message);
         }).finally(() => {
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalButtonText;
+            button.disabled = false;
+            button.innerHTML = originalText;
         });
     });
 
     function showSuccessMessage(message) {
         const successBox = document.createElement('div');
-        successBox.className = 'alert alert-success text-center mt-3';
+        successBox.className = 'alert alert-success mt-3 text-center';
         successBox.textContent = message;
+
         form.parentElement.appendChild(successBox);
 
         setTimeout(() => {
@@ -1198,6 +1199,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+
 
 
     <script>
