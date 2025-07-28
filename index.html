@@ -1148,58 +1148,61 @@
 
     <!-- thm custom script -->
     <script src="assets/js/custom.js"></script>
-<script>
+    <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('contact-form-1');
-    const button = form.querySelector('button[type="submit"]');
-    const originalText = button.innerHTML;
+    const forms = document.querySelectorAll('form[action^="https://formspree.io"]');
 
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
+    forms.forEach(function (form) {
+        const button = form.querySelector('button[type="submit"]');
+        const originalText = button.innerHTML;
 
-        // Create loading spinner
-        button.disabled = true;
-        button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sending...`;
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
 
-        const formData = new FormData(form);
+            // Add spinner
+            button.disabled = true;
+            button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sending...`;
 
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                form.reset();
-                showSuccessMessage("✅ Thank you! We'll contact you shortly.");
-            } else {
-                return response.json().then(data => {
-                    throw new Error(data.message || "Something went wrong.");
-                });
-            }
-        }).catch(error => {
-            alert("❌ Submission failed: " + error.message);
-        }).finally(() => {
-            button.disabled = false;
-            button.innerHTML = originalText;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    form.reset();
+                    showSuccessMessage(form, "✅ Thank you! We'll contact you shortly.");
+                } else {
+                    return response.json().then(data => {
+                        throw new Error(data.message || "Something went wrong.");
+                    });
+                }
+            }).catch(error => {
+                alert("❌ Submission failed: " + error.message);
+            }).finally(() => {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            });
         });
+
+        function showSuccessMessage(formElement, message) {
+            const successBox = document.createElement('div');
+            successBox.className = 'alert alert-success mt-3 text-center';
+            successBox.textContent = message;
+
+            // Place message just below the form
+            formElement.parentElement.appendChild(successBox);
+
+            setTimeout(() => {
+                successBox.remove();
+            }, 5000);
+        }
     });
-
-    function showSuccessMessage(message) {
-        const successBox = document.createElement('div');
-        successBox.className = 'alert alert-success mt-3 text-center';
-        successBox.textContent = message;
-
-        form.parentElement.appendChild(successBox);
-
-        setTimeout(() => {
-            successBox.remove();
-        }, 5000);
-    }
 });
 </script>
-
 
 
     <script>
